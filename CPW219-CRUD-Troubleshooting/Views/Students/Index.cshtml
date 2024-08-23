@@ -1,0 +1,34 @@
+﻿@model IEnumerable<CPW219_CRUD_Troubleshooting.Models.Student>
+
+@{
+    ViewData["Title"] = "Student Roster";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Date of Birth</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            <tr>
+                <td>@student.StudentId</td>
+                <td>@student.Name</td>
+                <td>@student.DateOfBirth.ToShortDateString()</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = student.StudentId })" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="@Url.Action("Delete", new { id = student.StudentId })" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create")" class="btn btn-success">Create New Student</a>

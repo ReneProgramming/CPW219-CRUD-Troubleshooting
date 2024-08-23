@@ -14,8 +14,8 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
 
         public IActionResult Index()
         {
-            List<Student> products = StudentDb.GetStudents(context);
-            return View();
+            List<Student> students = StudentDb.GetStudents(context);
+            return View(students);
         }
 
         public IActionResult Create()
@@ -29,10 +29,10 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
             if (ModelState.IsValid)
             {
                 StudentDb.Add(p, context);
+                context.SaveChanges(); // Ensure changes are saved to the database
                 ViewData["Message"] = $"{p.Name} was added!";
-                return View();
+                return RedirectToAction("Index");
             }
-
             //Show web page with errors
             return View(p);
         }
@@ -40,10 +40,13 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
         public IActionResult Edit(int id)
         {
             //get the product by id
-            Student p = StudentDb.GetStudent(context, id);
-
+            Student? p = StudentDb.GetStudent(context, id);
+            if (p == null)
+            {
+                return NotFound();
+            }
             //show it on web page
-            return View();
+            return View(p);
         }
 
         [HttpPost]
@@ -52,8 +55,9 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
             if (ModelState.IsValid)
             {
                 StudentDb.Update(context, p);
-                ViewData["Message"] = "Product Updated!";
-                return View(p);
+                context.SaveChanges(); // Ensure changes are saved to the database
+                ViewData["Message"] = "Student Updated!";
+                return RedirectToAction("Index");
             }
             //return view with errors
             return View(p);
@@ -62,18 +66,25 @@ namespace CPW219_CRUD_Troubleshooting.Controllers
         public IActionResult Delete(int id)
         {
             Student p = StudentDb.GetStudent(context, id);
+            if (p == null)
+            {
+                return NotFound();
+            }
             return View(p);
         }
 
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirm(int id)
+        [HttpPost]
+        public IActionResult DeleteConfirmed(int id)
         {
-            //Get Product from database
-            Student p = StudentDb.GetStudent(context, id);
+            Student? student = StudentDb.GetStudent(context, id);
+            if (student == null)
+            {
+                return NotFound(); // If student not found, return 404
+            }
 
-            StudentDb.Delete(context, p);
-
-            return RedirectToAction("Index");
+            StudentDb.Delete(context, student);
+            return RedirectToAction("Index"); // Redirect to Index after deletion
         }
+
     }
 }
